@@ -1,0 +1,87 @@
+CREATE SCHEMA `kirjaarkisto` ;
+
+CREATE TABLE `kirjaarkisto`.`kayttaja` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `nimi` VARCHAR(45) NOT NULL,
+  `salasana` VARCHAR(45) NOT NULL,
+  `admin` TINYINT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `nimi_UNIQUE` (`nimi` ASC) VISIBLE);
+
+CREATE TABLE `kirjaarkisto`.`kirjasarja` (
+  `idkirjasarja` INT NOT NULL AUTO_INCREMENT,
+  `kirjasarja` VARCHAR(45) NOT NULL,
+  `kustantaja` VARCHAR(45) NOT NULL,
+  `kuvaus` VARCHAR(45) NOT NULL,
+  `luokittelu` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idkirjasarja`));
+
+CREATE TABLE `kirjaarkisto`.`kirja` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `nimi` VARCHAR(45) NOT NULL,
+  `jarjestysnumero` INT NOT NULL,
+  `kuvausteksti` VARCHAR(45) NOT NULL,
+  `kirjailija` VARCHAR(45) NOT NULL,
+  `piirtajat` VARCHAR(45) NOT NULL,
+  `ensipainovuosi` INT NOT NULL,
+  `painokset` INT NOT NULL,
+  `idkirjasarja` INT NULL DEFAULT NULL,
+  `takakansikuva` VARCHAR(45) NULL DEFAULT NULL,
+  `etukansikuva` VARCHAR(45) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`));
+
+CREATE TABLE `kirjaarkisto`.`omatsarjat` (
+  `idomatsarjat` INT NOT NULL AUTO_INCREMENT,
+  `kirjasarja` VARCHAR(45) NOT NULL,
+  `kuvaus` VARCHAR(45) NOT NULL,
+  `kustantaja` VARCHAR(45) NOT NULL,
+  `luokittelu` VARCHAR(45) NOT NULL,
+  `kayttajaid` INT,
+  PRIMARY KEY (`idomatsarjat`));
+
+CREATE TABLE `kirjaarkisto`.`omakirja` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `nimi` VARCHAR(45) NOT NULL,
+  `jarjestysnumero` INT NOT NULL,
+  `kirjailija` VARCHAR(45) NOT NULL,
+  `idomatsarjat` INT,
+  `kuntoluokka` INT NOT NULL,
+  `takakansikuva` VARCHAR(45) NULL DEFAULT NULL,
+  `etukansikuva` VARCHAR(45) NULL DEFAULT NULL,
+  `hankintahinta` INT NULL DEFAULT NULL,
+  `hankintaaika` DATE NULL DEFAULT NULL,
+  `esittelyteksti` VARCHAR(45) NOT NULL,
+  `painovuosi` INT NOT NULL,
+  `painos` INT NOT NULL,
+  PRIMARY KEY (`id`));
+
+ALTER TABLE `kirjaarkisto`.`kirja` 
+ADD INDEX `idkirjasarja_idx` (`idkirjasarja` ASC) VISIBLE;
+;
+ALTER TABLE `kirjaarkisto`.`kirja` 
+ADD CONSTRAINT `idkirjasarja`
+  FOREIGN KEY (`idkirjasarja`)
+  REFERENCES `kirjaarkisto`.`kirjasarja` (`idkirjasarja`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `kirjaarkisto`.`omakirja` 
+ADD INDEX `idomatsarjat_idx` (`idomatsarjat` ASC) VISIBLE;
+;
+ALTER TABLE `kirjaarkisto`.`omakirja` 
+ADD CONSTRAINT `idomatsarjat`
+  FOREIGN KEY (`idomatsarjat`)
+  REFERENCES `kirjaarkisto`.`omatsarjat` (`idomatsarjat`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `kirjaarkisto`.`omatsarjat` 
+ADD INDEX `kayttajaid_idx` (`kayttajaid` ASC) VISIBLE;
+;
+ALTER TABLE `kirjaarkisto`.`omatsarjat` 
+ADD CONSTRAINT `kayttajaid`
+  FOREIGN KEY (`kayttajaid`)
+  REFERENCES `kirjaarkisto`.`kayttaja` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
